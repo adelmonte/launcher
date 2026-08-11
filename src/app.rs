@@ -291,7 +291,7 @@ impl App {
         if !start_hidden {
             app.win.show_all();
             app.visible.set(true);
-            app.focus_entry();
+            app.blur_entry();
             app.signal_waybar();
         }
 
@@ -391,7 +391,7 @@ impl App {
         self.win.show_all();
         self.win.present();
         self.visible.set(true);
-        self.focus_entry();
+        self.blur_entry();
         self.signal_waybar();
 
         let app = self.clone();
@@ -503,6 +503,13 @@ impl App {
             self.search_entry.grab_focus_without_selecting();
             self.search_entry.set_position(-1);
         }
+    }
+
+    /// Park focus outside the entry so it renders its placeholder. GTK3 hides
+    /// placeholder text as soon as an entry is focused, and the first keypress
+    /// hands focus back via `on_key_press`, so nothing is lost by waiting.
+    fn blur_entry(&self) {
+        self.win.set_focus(None::<&gtk::Widget>);
     }
 
     // --- navigation / views ---
@@ -1054,7 +1061,7 @@ impl App {
             menu.connect_hide(move |_| {
                 if let Some(app) = weak.upgrade() {
                     app.menu_open.set(false);
-                    app.focus_entry();
+                    app.sync_entry_focus();
                 }
             });
         }
@@ -1303,8 +1310,18 @@ impl App {
         if let Some(id) = self.focus_out_timeout.borrow_mut().take() {
             id.remove();
         }
-        self.focus_entry();
+        self.sync_entry_focus();
         glib::Propagation::Proceed
+    }
+
+    /// Mid-search the caret belongs in the entry; with an empty query the
+    /// placeholder should be showing instead.
+    fn sync_entry_focus(&self) {
+        if self.search_entry.text().is_empty() {
+            self.blur_entry();
+        } else {
+            self.focus_entry();
+        }
     }
 
     fn on_key_press(self: &Rc<Self>, ev: &gdk::EventKey) -> glib::Propagation {
