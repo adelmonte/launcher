@@ -475,6 +475,7 @@ impl App {
             None => count - 1,
         };
         self.select_index(&lb, next);
+        self.blur_entry_if_empty();
     }
 
     /// Move the highlight under the mouse, without scrolling.
@@ -482,6 +483,7 @@ impl App {
         if let Some(lb) = listbox_of(row) {
             if lb.selected_row().as_ref() != Some(row) {
                 lb.select_row(Some(row));
+                self.blur_entry_if_empty();
             }
         }
     }
@@ -510,6 +512,15 @@ impl App {
     /// hands focus back via `on_key_press`, so nothing is lost by waiting.
     fn blur_entry(&self) {
         self.win.set_focus(None::<&gtk::Widget>);
+    }
+
+    /// Moving the selection by key or pointer with nothing typed means the user
+    /// is browsing rather than searching, so hand the placeholder back — this
+    /// is what restores it after a query is backspaced away.
+    fn blur_entry_if_empty(&self) {
+        if self.search_entry.text().is_empty() {
+            self.blur_entry();
+        }
     }
 
     // --- navigation / views ---
@@ -1370,6 +1381,7 @@ impl App {
             let lb = self.current_listbox();
             let last = lb.children().len() as i32 - 1;
             self.select_index(&lb, if kv == key::Home { 0 } else { last });
+            self.blur_entry_if_empty();
             return glib::Propagation::Stop;
         }
 
