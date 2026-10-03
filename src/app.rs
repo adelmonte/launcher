@@ -166,6 +166,7 @@ pub struct App {
     keyboard_mode: Cell<bool>,
     last_pointer_root: Cell<(f64, f64)>,
     activate_blocked: Cell<bool>,
+    armed_key: Cell<Option<gdk::keys::Key>>,
     menu_open: Cell<bool>,
     is_animating: Cell<bool>,
     visible: Cell<bool>,
@@ -266,6 +267,7 @@ impl App {
             keyboard_mode: Cell::new(true),
             last_pointer_root: Cell::new((f64::NAN, f64::NAN)),
             activate_blocked: Cell::new(false),
+            armed_key: Cell::new(None),
             menu_open: Cell::new(false),
             is_animating: Cell::new(false),
             visible: Cell::new(false),
@@ -361,6 +363,10 @@ impl App {
         }
         {
             let app = self.clone();
+            self.win.connect_key_release_event(move |_, ev| app.on_key_release(ev));
+        }
+        {
+            let app = self.clone();
             self.win.connect_delete_event(move |_, _| {
                 app.hide_launcher();
                 glib::Propagation::Stop
@@ -387,6 +393,7 @@ impl App {
 
         // Block activation until stale Wayland key events pass.
         self.activate_blocked.set(true);
+        self.armed_key.set(None);
 
         self.win.show_all();
         self.win.present();
@@ -1335,6 +1342,26 @@ impl App {
         }
     }
 
+    /// Escape and Enter act on release: hiding on the press unmaps the window
+    /// before the release arrives, which leaves GTK's client-side key repeat
+    /// running and replaying the key into the next show.
+    fn on_key_release(self: &Rc<Self>, ev: &gdk::EventKey) -> glib::Propagation {
+        use gdk::keys::constants as key;
+        let kv = ev.keyval();
+
+        if self.armed_key.get() != Some(kv) {
+            return glib::Propagation::Proceed;
+        }
+        self.armed_key.set(None);
+
+        if kv == key::Escape {
+            self.hide_launcher();
+        } else {
+            self.activate_selection();
+        }
+        glib::Propagation::Stop
+    }
+
     fn on_key_press(self: &Rc<Self>, ev: &gdk::EventKey) -> glib::Propagation {
         use gdk::keys::constants as key;
         let kv = ev.keyval();
@@ -1346,7 +1373,7 @@ impl App {
             if depth > 1 {
                 self.go_back();
             } else {
-                self.hide_launcher();
+                self.armed_key.set(Some(kv));
             }
             return glib::Propagation::Stop;
         }
@@ -1369,7 +1396,7 @@ impl App {
         }
 
         if kv == key::Return || kv == key::KP_Enter {
-            self.activate_selection();
+            self.armed_key.set(Some(kv));
             return glib::Propagation::Stop;
         }
 
