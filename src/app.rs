@@ -158,6 +158,8 @@ pub struct App {
     categories: RefCell<BTreeMap<String, Vec<usize>>>,
     favorites: RefCell<Vec<String>>,
     view_stack: RefCell<Vec<View>>,
+    /// Selected row index of each view below the top, restored on go_back.
+    selection_stack: RefCell<Vec<i32>>,
 
     current: Cell<ActiveView>,
     dragging: Cell<bool>,
@@ -260,6 +262,7 @@ impl App {
             categories: RefCell::new(BTreeMap::new()),
             favorites: RefCell::new(load_favorites()),
             view_stack: RefCell::new(Vec::new()),
+            selection_stack: RefCell::new(Vec::new()),
             current: Cell::new(ActiveView::One),
             dragging: Cell::new(false),
             drag_row: RefCell::new(None),
@@ -387,6 +390,7 @@ impl App {
 
         // Reset to favorites view
         self.view_stack.borrow_mut().clear();
+        self.selection_stack.borrow_mut().clear();
         self.set_search_text_silently("");
         self.keyboard_mode.set(true);
         self.show_favorites_view();
@@ -551,6 +555,7 @@ impl App {
 
     fn show_favorites_view(self: &Rc<Self>) {
         *self.view_stack.borrow_mut() = vec![View::Favorites];
+        self.selection_stack.borrow_mut().clear();
         let lb = self.current_listbox();
         self.repopulate(&lb, |lb| self.populate_favorites(lb));
     }
@@ -559,6 +564,11 @@ impl App {
         if self.is_animating.get() {
             return;
         }
+        let selected = self
+            .current_listbox()
+            .selected_row()
+            .map_or(0, |r| r.index());
+        self.selection_stack.borrow_mut().push(selected);
         self.view_stack.borrow_mut().push(view.clone());
         let app = self.clone();
         self.animate_transition("forward", move |lb| app.render_view(&view, lb));
@@ -579,8 +589,16 @@ impl App {
                 None => return,
             }
         };
+        let selected = self.selection_stack.borrow_mut().pop().unwrap_or(0);
         let app = self.clone();
         self.animate_transition("back", move |lb| app.render_view(&prev, lb));
+        if selected > 0 {
+            let app = self.clone();
+            glib::idle_add_local_once(move || {
+                let lb = app.current_listbox();
+                app.select_index(&lb, selected);
+            });
+        }
     }
 
     /// Rebuild the view currently on top of the stack, in place.
