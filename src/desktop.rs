@@ -148,8 +148,14 @@ fn map_category(cat: &str) -> Option<&'static str> {
         "Settings" => "Settings",
         "System" => "System Tools",
         "Utility" => "Accessories",
+        "HamRadio" => "Multimedia",
         _ => return None,
     })
+}
+
+/// Firefox PWAs (firefoxpwa) don't set useful categories.
+fn is_web_app(desktop_id: &str) -> bool {
+    desktop_id.starts_with("FFPWA-")
 }
 
 /// Map app indices into category buckets. BTreeMap keeps the categories sorted
@@ -158,27 +164,21 @@ pub fn organize_by_category(apps: &[AppEntry]) -> BTreeMap<String, Vec<usize>> {
     let mut categories: BTreeMap<String, Vec<usize>> = BTreeMap::new();
 
     for (i, app) in apps.iter().enumerate() {
-        let cats = app.app_info.categories();
-        let cats = match cats {
-            Some(c) if !c.is_empty() => c.to_string(),
-            _ => {
-                categories.entry("Other".to_string()).or_default().push(i);
-                continue;
-            }
-        };
+        let cats = app
+            .app_info
+            .categories()
+            .map(|c| c.to_string())
+            .unwrap_or_default();
 
-        let mut categorized = false;
-        for cat in cats.split(';').map(|s| s.trim()).filter(|s| !s.is_empty()) {
-            if let Some(target) = map_category(cat) {
-                categories.entry(target.to_string()).or_default().push(i);
-                categorized = true;
-                break;
-            }
-        }
+        let target = cats
+            .split(';')
+            .map(|s| s.trim())
+            .filter(|s| !s.is_empty())
+            .find_map(map_category)
+            .or_else(|| is_web_app(&app.desktop_id).then_some("Internet"))
+            .unwrap_or("Other");
 
-        if !categorized {
-            categories.entry("Other".to_string()).or_default().push(i);
-        }
+        categories.entry(target.to_string()).or_default().push(i);
     }
 
     categories
