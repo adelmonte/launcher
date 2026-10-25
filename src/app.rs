@@ -117,19 +117,19 @@ fn load_favorites() -> Vec<String> {
 
 fn category_icon(name: &str) -> &'static str {
     match name {
-        "Multimedia" => "applications-multimedia",
-        "Development" => "applications-development",
-        "Education" => "applications-science",
-        "Games" => "applications-games",
-        "Graphics" => "applications-graphics",
-        "Internet" => "applications-internet",
-        "Office" => "applications-office",
-        "Science" => "applications-science",
-        "Settings" => "preferences-system",
-        "System Tools" => "applications-system",
-        "Accessories" => "applications-accessories",
-        "Other" => "applications-other",
-        _ => "folder",
+        "Multimedia" => "applications-multimedia-symbolic",
+        "Development" => "applications-development-symbolic",
+        "Education" => "applications-education-symbolic",
+        "Games" => "applications-games-symbolic",
+        "Graphics" => "applications-graphics-symbolic",
+        "Internet" => "applications-internet-symbolic",
+        "Office" => "applications-office-symbolic",
+        "Science" => "applications-science-symbolic",
+        "Settings" => "preferences-system-symbolic",
+        "System Tools" => "applications-system-symbolic",
+        "Accessories" => "applications-utilities-symbolic",
+        "Other" => "applications-other-symbolic",
+        _ => "folder-symbolic",
     }
 }
 
