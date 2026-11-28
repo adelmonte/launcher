@@ -2,6 +2,8 @@
 name = "launcher"
 version = "0.2.0"
 edition = "2021"
+license = "GPL-3.0-or-later"
+description = "An application launcher for Wayland status bars"
 
 [[bin]]
 name = "launcher"

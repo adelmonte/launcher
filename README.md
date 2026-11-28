@@ -11,9 +11,15 @@ A simple application launcher I wrote during my transition from xfce-panel's whi
 - **Categories, search, and full keyboard navigation** out of the box, with right-click to launch or open a `.desktop` file's location.
 - **Daemon mode**: runs hidden and toggles instantly, and records whether it is shown in `/tmp/launcher.lock` so a status bar can highlight its button.
 
-## Building
+## Installing
 
-The launcher is drawn with [gui-toolkit](https://github.com/adelmonte/gui-toolkit), which cargo fetches:
+On Arch:
+
+```sh
+cd packaging && makepkg -si
+```
+
+From source (the launcher is drawn with [gui-toolkit](https://github.com/adelmonte/gui-toolkit), which cargo fetches):
 
 ```sh
 cargo build --release

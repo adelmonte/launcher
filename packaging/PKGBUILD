@@ -1,0 +1,40 @@
+# Maintainer: adelmonte
+pkgname=launcher
+pkgver=0.2.0
+pkgrel=1
+pkgdesc='An application launcher for Wayland status bars, with favorites, categories and search'
+arch=('x86_64')
+url='https://github.com/adelmonte/launcher'
+license=('GPL-3.0-or-later')
+depends=('libxkbcommon' 'fontconfig' 'glibc' 'gcc-libs')
+optdepends=("xdg-utils: open a .desktop file's location"
+            'gtk3: gtk-launch fallback for entries that fail to start')
+makedepends=('cargo')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
+sha256sums=('SKIP')
+options=('!lto')
+
+prepare() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo fetch --locked --target "$(rustc -vV | sed -n 's/host: //p')"
+}
+
+build() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  export CARGO_TARGET_DIR=target
+  cargo build --frozen --release
+}
+
+check() {
+  cd "$pkgname-$pkgver"
+  export RUSTUP_TOOLCHAIN=stable
+  cargo test --frozen --release
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+  install -Dm755 target/${CARGO_BUILD_TARGET:-.}/release/launcher "$pkgdir/usr/bin/launcher"
+  install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}
