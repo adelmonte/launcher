@@ -1,7 +1,6 @@
 use std::fs;
 use std::io::Write;
 use std::path::Path;
-use std::process::{Command, Stdio};
 
 pub const LOCK_FILE: &str = "/tmp/launcher.lock";
 
@@ -47,7 +46,8 @@ pub fn write_lock() {
     }
 }
 
-pub fn signal_waybar(visible: bool) {
+/// Records whether the launcher is visible in the lock file; status bars watch it.
+pub fn write_state(visible: bool) {
     if let Ok(mut f) = fs::File::create(LOCK_FILE) {
         let _ = write!(
             f,
@@ -56,19 +56,8 @@ pub fn signal_waybar(visible: bool) {
             if visible { "visible" } else { "hidden" }
         );
     }
-    let _ = Command::new("pkill")
-        .arg("-RTMIN+8")
-        .arg("waybar")
-        .stderr(Stdio::null())
-        .status();
 }
 
 pub fn cleanup_lock() {
     let _ = fs::remove_file(LOCK_FILE);
-    // Signal waybar that launcher is inactive
-    let _ = Command::new("pkill")
-        .arg("-RTMIN+8")
-        .arg("waybar")
-        .stderr(Stdio::null())
-        .status();
 }

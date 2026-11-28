@@ -297,7 +297,7 @@ impl App {
             app.win.show_all();
             app.visible.set(true);
             app.blur_entry();
-            app.signal_waybar();
+            app.publish_state();
         }
 
         app
@@ -403,7 +403,7 @@ impl App {
         self.win.present();
         self.visible.set(true);
         self.blur_entry();
-        self.signal_waybar();
+        self.publish_state();
 
         let app = self.clone();
         glib::timeout_add_local_once(Duration::from_millis(150), move || {
@@ -417,11 +417,11 @@ impl App {
         }
         self.win.hide();
         self.visible.set(false);
-        self.signal_waybar();
+        self.publish_state();
     }
 
-    fn signal_waybar(&self) {
-        lockfile::signal_waybar(self.visible.get());
+    fn publish_state(&self) {
+        lockfile::write_state(self.visible.get());
     }
 
     fn set_search_text_silently(&self, text: &str) {

@@ -7,9 +7,9 @@ A simple application launcher I wrote during my transition from xfce-panel's whi
 ## Features
 
 - **Starring applications** adds them to the main startup view and creates the file `~/.config/launcher-favorites.json`. Favorites can be reordered by dragging them.
-- **Command execution**: if your search doesn't match an application, pressing Enter runs it as a command (e.g. `pkill waybar`).
+- **Command execution**: if your search doesn't match an application, pressing Enter runs it as a command (e.g. `pkill panel`).
 - **Categories, search, and full keyboard navigation** out of the box, with right-click to launch or open a `.desktop` file's location.
-- **Daemon mode**: runs hidden and toggles instantly, and signals waybar when shown/hidden.
+- **Daemon mode**: runs hidden and toggles instantly, and records whether it is shown in `/tmp/launcher.lock` so a status bar can highlight its button.
 
 ## Building
 
@@ -28,7 +28,7 @@ launcher --daemon   # start hidden in the background
 launcher            # toggle the running daemon's visibility
 ```
 
-Running `launcher` while a daemon is already running signals the existing instance (via `/tmp/launcher.lock`) instead of starting a new one, so you can bind a single command to a key. It also signals waybar (`pkill -RTMIN+8 waybar`) whenever it's shown or hidden.
+Running `launcher` while a daemon is already running signals the existing instance (via `/tmp/launcher.lock`) instead of starting a new one, so you can bind a single command to a key. It also writes `visible` or `hidden` to the second line of that file whenever it's shown or hidden.
 
 ## Shell Configuration
 
