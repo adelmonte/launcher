@@ -11,7 +11,7 @@ optdepends=("xdg-utils: open a .desktop file's location"
             'gtk3: gtk-launch fallback for entries that fail to start')
 makedepends=('cargo')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')
+sha256sums=('c95a4a17b4dd3554c08bdc5135d428704f55f0dc2c5a3ec5006bfa5c7a290f05')
 options=('!lto')
 
 prepare() {
