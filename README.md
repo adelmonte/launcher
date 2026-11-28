@@ -13,9 +13,13 @@ A simple application launcher I wrote during my transition from xfce-panel's whi
 
 ## Building
 
+The launcher is drawn with [gui-toolkit](https://github.com/adelmonte/gui-toolkit), which cargo fetches:
+
 ```sh
 cargo build --release
 ```
+
+It needs a Wayland compositor with `xdg-shell`, `libxkbcommon` and fontconfig. Colors, font and icon theme follow your GTK settings and can be overridden in `~/.config/gui-toolkit/theme.toml`.
 
 The binary is at `target/release/launcher`.
 

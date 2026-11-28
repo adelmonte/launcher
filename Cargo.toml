@@ -1,6 +1,6 @@
 [package]
 name = "launcher"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
 [[bin]]
@@ -8,9 +8,10 @@ name = "launcher"
 path = "src/main.rs"
 
 [dependencies]
-gtk = { version = "0.18", features = ["v3_24"] }
+gui-toolkit = { git = "https://github.com/adelmonte/gui-toolkit", tag = "v0.1.0" }
 serde_json = "1"
 libc = "0.2"
+signal-hook = "0.3"
 
 [profile.release]
 opt-level = 3
