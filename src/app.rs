@@ -21,6 +21,8 @@ const SPACING: f32 = 10.0;
 const APP_ICON: f32 = 32.0;
 const CATEGORY_ICON: f32 = 24.0;
 const SMALL_ICON: f32 = 16.0;
+/// Stars and chevrons, drawn inside a SMALL_ICON box.
+const GLYPH_ICON: f32 = 11.0;
 const STAR_BUTTON: (f32, f32) = (34.0, 26.0);
 const NAV_H: f32 = 35.0;
 const SEPARATOR_H: f32 = 5.0;
@@ -1169,14 +1171,14 @@ impl App {
                         }
                     }
                     let star = if *favorite { "starred" } else { "non-starred" };
-                    dc.icon(&Icon::name(star), bx + (bw - SMALL_ICON) / 2.0, by + (bh - SMALL_ICON) / 2.0, SMALL_ICON, Some(symbolic));
+                    dc.icon(&Icon::name(star), bx + ((bw - GLYPH_ICON) / 2.0).round(), by + ((bh - GLYPH_ICON) / 2.0).round(), GLYPH_ICON, Some(symbolic));
                 }
                 Row::Category { name, icon } => {
                     dc.icon(&Icon::name(*icon), x + MARGIN, y + ((ROW_H - CATEGORY_ICON) / 2.0).round(), CATEGORY_ICON, Some(symbolic));
                     let label_x = x + MARGIN + CATEGORY_ICON + SPACING;
                     let arrow_x = x + w - MARGIN - SMALL_ICON;
                     dc.text_v_centered(label_x, y, ROW_H, name, label, Some((arrow_x - SPACING - label_x).max(0.0)));
-                    dc.icon(&Icon::name("pan-end-symbolic"), arrow_x, y + ((ROW_H - SMALL_ICON) / 2.0).round(), SMALL_ICON, Some(symbolic));
+                    dc.icon(&Icon::name("pan-end-symbolic"), arrow_x + ((SMALL_ICON - GLYPH_ICON) / 2.0).round(), y + ((ROW_H - GLYPH_ICON) / 2.0).round(), GLYPH_ICON, Some(symbolic));
                 }
             }
         }
@@ -1232,7 +1234,7 @@ impl App {
         let max_w = if self.nav.forward { arrow_x - SPACING - label_x } else { l.w - MARGIN - label_x };
         dc.text_v_centered(label_x, ny, nh, self.nav.label, &label, Some(max_w.max(0.0)));
         if self.nav.forward {
-            dc.icon(&Icon::name("pan-end-symbolic"), arrow_x, ny + ((nh - SMALL_ICON) / 2.0).round(), SMALL_ICON, Some(theme.fg));
+            dc.icon(&Icon::name("pan-end-symbolic"), arrow_x + ((SMALL_ICON - GLYPH_ICON) / 2.0).round(), ny + ((nh - GLYPH_ICON) / 2.0).round(), GLYPH_ICON, Some(theme.fg));
         }
 
         let (ex, ey, ew, eh) = l.entry;

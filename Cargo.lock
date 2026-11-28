@@ -261,8 +261,8 @@ dependencies = [
 
 [[package]]
 name = "gui-toolkit"
-version = "0.1.0"
-source = "git+https://github.com/adelmonte/gui-toolkit?tag=v0.1.0#01baaf12af85ae8e09af91759812b43710cdacb7"
+version = "0.1.1"
+source = "git+https://github.com/adelmonte/gui-toolkit?tag=v0.1.1#e77deb3dabec3617abf29ccaf2f8924b21f69d8a"
 dependencies = [
  "cosmic-text",
  "resvg",
@@ -317,7 +317,7 @@ dependencies = [
 
 [[package]]
 name = "launcher"
-version = "0.2.0"
+version = "0.2.1"
 dependencies = [
  "gui-toolkit",
  "libc",

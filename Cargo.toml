@@ -1,6 +1,6 @@
 [package]
 name = "launcher"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 license = "GPL-3.0-or-later"
 description = "An application launcher for Wayland status bars"
@@ -10,7 +10,7 @@ name = "launcher"
 path = "src/main.rs"
 
 [dependencies]
-gui-toolkit = { git = "https://github.com/adelmonte/gui-toolkit", tag = "v0.1.0" }
+gui-toolkit = { git = "https://github.com/adelmonte/gui-toolkit", tag = "v0.1.1" }
 serde_json = "1"
 libc = "0.2"
 signal-hook = "0.3"
